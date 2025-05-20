@@ -12,6 +12,7 @@ client = WebClient(token=SLACK_BOT_TOKEN)
 
 @app.route("/slack/events", methods=["POST"])
 def slack_events():
+    print("🔔 Incoming request from Slack")
     data = request.get_json()
     
     # Slack verification challenge
