@@ -44,3 +44,7 @@ def slack_events():
                 except Exception as e:
                     print(f"General error: {e}")
     return make_response("OK", 200)
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 3000))
+    app.run(host="0.0.0.0", port=port)
