@@ -43,12 +43,13 @@ def slack_events():
                         ], check=True)
 
                         logger.info("✅ Download complete. Uploading to Slack...")
-                        client.files_upload(
-                            channels=event["channel"],
+                        client.files_upload_v2(
+                            channel=event["channel"],
                             file="space_audio.mp3",
                             title="Downloaded Twitter Space",
                             initial_comment="Here’s the audio from the posted Twitter Space."
                         )
+
                         os.remove("space_audio.mp3")
                         logger.info("🚮 File cleaned up")
 
