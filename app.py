@@ -38,11 +38,14 @@ def slack_events():
             url_match = re.search(r"https:\/\/twitter\.com\/i\/spaces\/\w+", event["text"])
             if url_match:
                 space_url = url_match.group(0)
+                logger.info("🎯 Matched Twitter Space URL: %s", space_url)
                 try:
+                    logger.info("🎧 Running yt-dlp...")
                     # Download audio
                     subprocess.run([
                         "yt-dlp", "-x", "--audio-format", "mp3", "-o", "space_audio.%(ext)s", space_url
                     ], check=True)
+                    logger.info("✅ Download complete. Uploading to Slack...")
 
                     # Upload audio to Slack
                     client.files_upload(
@@ -52,6 +55,11 @@ def slack_events():
                         initial_comment="Here’s the audio from the posted Twitter Space."
                     )
                     os.remove("space_audio.mp3")
+                    logger.info("🚮 File cleaned up")
+                except Exception as e:
+                    logger.error("❌ Error processing download/upload: %s", e)
+
+                
                 except SlackApiError as e:
                     print(f"Slack error: {e.response['error']}")
                 except Exception as e:
