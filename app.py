@@ -38,28 +38,31 @@ def slack_events():
                     try:
                         logger.info("🎧 Running yt-dlp...")
                         subprocess.run([
-                            "yt-dlp", "-x", "--audio-format", "mp3",
+                            "yt-dlp", "-f", "bestaudio",
                             "-o", "space_audio.%(ext)s", space_url
                         ], check=True)
-
-                        logger.info("✅ Download complete. Uploading to Slack...")
-                        client.files_upload_v2(
-                            channel=event["channel"],
-                            file="space_audio.mp3",
-                            title="Downloaded Twitter Space",
-                            initial_comment="Here’s the audio from the posted Twitter Space."
-                        )
+                    
+                        # Find the actual downloaded file (e.g., .m4a or .webm)
+                        downloaded_file = next((f for f in os.listdir() if f.startswith("space_audio.")), None)
                         
-                        if os.path.exists("space_audio.mp3"):
-                            os.remove("space_audio.mp3")
-                            logger.info("🚮 File cleaned up")
+                        if downloaded_file:
+                            logger.info("✅ Download complete. Uploading %s to Slack...", downloaded_file)
+                            client.files_upload_v2(
+                                channel=event["channel"],
+                                file=downloaded_file,
+                                title="Downloaded Twitter Space",
+                                initial_comment="Here’s the audio from the posted Twitter Space."
+                            )
+                            os.remove(downloaded_file)
+                            logger.info("🚮 File %s cleaned up", downloaded_file)
                         else:
-                            logger.warning("⚠️ Tried to delete missing file: space_audio.mp3")
-
+                            logger.error("❌ Could not find downloaded file to upload.")
+                    
                     except SlackApiError as e:
                         logger.error("Slack error: %s", e.response["error"])
                     except Exception as e:
                         logger.error("❌ Error processing download/upload: %s", e)
+
 
         return make_response("Event received", 200)
 
