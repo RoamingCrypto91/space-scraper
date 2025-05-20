@@ -49,9 +49,12 @@ def slack_events():
                             title="Downloaded Twitter Space",
                             initial_comment="Here’s the audio from the posted Twitter Space."
                         )
-
-                        os.remove("space_audio.mp3")
-                        logger.info("🚮 File cleaned up")
+                        
+                        if os.path.exists("space_audio.mp3"):
+                            os.remove("space_audio.mp3")
+                            logger.info("🚮 File cleaned up")
+                        else:
+                            logger.warning("⚠️ Tried to delete missing file: space_audio.mp3")
 
                     except SlackApiError as e:
                         logger.error("Slack error: %s", e.response["error"])
