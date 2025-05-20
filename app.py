@@ -4,6 +4,9 @@ import os
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 import re
+import logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 SLACK_BOT_TOKEN = os.environ.get("SLACK_BOT_TOKEN")
 
