@@ -12,12 +12,21 @@ client = WebClient(token=SLACK_BOT_TOKEN)
 
 @app.route("/slack/events", methods=["POST"])
 def slack_events():
-    print("🔔 Incoming request from Slack")
-    data = request.get_json()
-    
-    # Slack verification challenge
-    if data.get("type") == "url_verification":
-        return make_response(data["challenge"], 200, {"content_type": "text/plain"})
+    print("🔥 HIT /slack/events route")
+
+    try:
+        data = request.get_json(force=True)  # force parsing
+        print("📨 Received payload:", data)
+
+        if data.get("type") == "url_verification":
+            return make_response(data["challenge"], 200, {"content_type": "text/plain"})
+
+        # Handle events here
+        return make_response("Event received", 200)
+
+    except Exception as e:
+        print("❌ Error handling request:", e)
+        return make_response("Error", 500)
 
     # Respond to messages
     if "event" in data:
