@@ -29,11 +29,17 @@ def slack_events():
 
         if "event" in data:
             event = data["event"]
+
+            # Stop early if it's a message update
+            if event.get("subtype") == "message_changed":
+                logger.info("🛑 Ignoring message_changed event")
+                return make_response("OK", 200)
+
+            # Stop early if it's a bot message
             if event.get("user") == BOT_USER_ID:
                 logger.info("🛑 Ignoring message from the bot itself")
                 return make_response("OK", 200)
             
-
             # Only handle plain user messages
             if event.get("type") == "message" and event.get("subtype") is None and "text" in event:
                 url_match = re.search(r"https:\/\/(twitter|x)\.com\/i\/spaces\/\w+", event["text"])
