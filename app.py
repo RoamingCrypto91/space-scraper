@@ -27,6 +27,10 @@ def slack_events():
 
         if "event" in data:
             event = data["event"]
+            if event.get("user") == client.auth_test()["user_id"]:
+                logger.info("🛑 Ignoring message from the bot itself")
+                return make_response("OK", 200)
+            
 
             # Only handle plain user messages
             if event.get("type") == "message" and event.get("subtype") is None and "text" in event:
