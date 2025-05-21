@@ -14,6 +14,8 @@ SLACK_BOT_TOKEN = os.environ.get("SLACK_BOT_TOKEN")
 app = Flask(__name__)
 client = WebClient(token=SLACK_BOT_TOKEN)
 
+BOT_USER_ID = client.auth_test()["user_id"]
+
 @app.route("/slack/events", methods=["POST"])
 def slack_events():
     logger.info("🔥 HIT /slack/events route")
@@ -27,7 +29,7 @@ def slack_events():
 
         if "event" in data:
             event = data["event"]
-            if event.get("user") == client.auth_test()["user_id"]:
+            if event.get("user") == BOT_USER_ID:
                 logger.info("🛑 Ignoring message from the bot itself")
                 return make_response("OK", 200)
             
