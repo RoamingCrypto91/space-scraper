@@ -34,7 +34,7 @@ def slack_events():
 
             # Only handle plain user messages
             if event.get("type") == "message" and event.get("subtype") is None and "text" in event:
-                url_match = re.search(r"https:\/\/twitter\.com\/i\/spaces\/\w+", event["text"])
+                url_match = re.search(r"https:\/\/(twitter|x)\.com\/i\/spaces\/\w+", event["text"])
                 if url_match:
                     space_url = url_match.group(0)
                     logger.info("🎯 Matched Twitter Space URL: %s", space_url)
