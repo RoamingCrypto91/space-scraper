@@ -37,6 +37,12 @@ def slack_events():
 
                     try:
                         logger.info("🎧 Running yt-dlp...")
+                        response = client.chat_postMessage(
+                            channel=event["channel"],
+                            thread_ts=event["ts"],
+                            text=f"🛰️ Downloading the Twitter Space from <{space_url}>... sit tight!"
+                        )
+                        logger.info("💬 Posted download-start message to Slack")                        
                         subprocess.run([
                             "yt-dlp", "-f", "bestaudio",
                             "-o", "space_audio.%(ext)s", space_url
@@ -49,9 +55,10 @@ def slack_events():
                             logger.info("✅ Download complete. Uploading %s to Slack...", downloaded_file)
                             client.files_upload_v2(
                                 channel=event["channel"],
+                                thread_ts=response["ts"],  # keep in same thread
                                 file=downloaded_file,
                                 title="Downloaded Twitter Space",
-                                initial_comment="Here’s the audio from the posted Twitter Space."
+                                initial_comment="✅ Here’s the audio from the posted Twitter Space."
                             )
                             os.remove(downloaded_file)
                             logger.info("🚮 File %s cleaned up", downloaded_file)
