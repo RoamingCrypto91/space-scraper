@@ -45,11 +45,11 @@ def slack_events():
                         logger.info("💬 Posted download-start message to Slack")                        
                         subprocess.run([
                             "yt-dlp", "-f", "bestaudio",
-                            "-o", "space_audio.%(ext)s", space_url
+                            "-o", "space_%(upload_date)s.%(ext)s"
                         ], check=True)
                     
                         # Find the actual downloaded file (e.g., .m4a or .webm)
-                        downloaded_file = next((f for f in os.listdir() if f.startswith("space_audio.")), None)
+                        downloaded_file = next((f for f in os.listdir() if f.startswith("space_") and f.endswith((".m4a", ".webm"))), None)
                         
                         if downloaded_file:
                             logger.info("✅ Download complete. Uploading %s to Slack...", downloaded_file)
