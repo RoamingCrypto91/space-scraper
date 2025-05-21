@@ -5,6 +5,9 @@ from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 import re
 import logging
+from collections import deque
+
+recent_ts = deque(maxlen=100)  # stores recent message timestamps
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -39,6 +42,13 @@ def slack_events():
             if event.get("user") == BOT_USER_ID:
                 logger.info("🛑 Ignoring message from the bot itself")
                 return make_response("OK", 200)
+
+            msg_ts = event.get("ts")
+            if msg_ts in recent_ts:
+                logger.info("⚠️ Already handled message ts=%s, skipping", msg_ts)
+                return make_response("OK", 200)
+            else:
+                recent_ts.append(msg_ts)
             
             # Only handle plain user messages
             if event.get("type") == "message" and event.get("subtype") is None and "text" in event:
